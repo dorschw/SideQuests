@@ -61,7 +61,7 @@ def find_missing_args(conditions_path: str, context_json_path: str) -> None:
 
     for k in must_not_be_empty:
         if k in flat_json:
-            if flat_json[k]:
+            if flat_json[k] or isinstance(flat_json[k], (bool, int)):
                 ok.append(k)
             else:
                 empty.append(k)
