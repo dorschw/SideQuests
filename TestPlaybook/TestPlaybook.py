@@ -40,22 +40,32 @@ def flatten(dictionary, parent_key=False, separator='.', crumbs: bool = False):
 
 
 not_empty_regex = re.compile('(.*) Is not empty')
+is_defined_regex = re.compile('(.*) Is defined')
 
 
 def find_missing_args(conditions_path: str, context_json_path: str) -> None:
-    must_not_be_empty = []
-
     with open(conditions_path, 'rt') as f:
         conditions = f.readlines()
+
+    must_not_be_empty = []
+    must_be_defined = []
 
     for c in conditions:
         match = not_empty_regex.match(c)
         if match:
             must_not_be_empty.append(match.group(1))
+        else:
+            match = is_defined_regex.match(c)
+            if match:
+                must_be_defined.append(c)
+
+    searched_for = len(must_be_defined + must_not_be_empty)
 
     with open(context_json_path, 'rt') as f:
         j = json.load(f)
     flat_json = flatten(j)
+    print(flat_json)
+    return
 
     ok, missing, empty, redundant = [], [], [], []
 
@@ -67,6 +77,10 @@ def find_missing_args(conditions_path: str, context_json_path: str) -> None:
                 empty.append(k)
         else:
             missing.append(k)
+
+    for k in must_be_defined:
+        if k in flat_json:
+            ok.append(k)
 
     for k in flat_json:
         if k not in must_not_be_empty:
@@ -85,7 +99,7 @@ def find_missing_args(conditions_path: str, context_json_path: str) -> None:
         else:
             print(f'>>no {title} values')
 
-    print(f'{len(ok)} must-not-be-empty values exist in context ({100*(round(len(ok)/len(must_not_be_empty),2))}%),\n'
+    print(f'{len(ok)} must-not-be-empty values exist in context ({100*(round(len(ok)/searched_for,2))}%),\n'
           f'{len(missing)} are missing: {missing}')
 
 

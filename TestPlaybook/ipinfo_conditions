@@ -5,14 +5,13 @@ IPinfo.IP.ASOwner Is not empty
 IPinfo.IP.Geo.Location Is not empty
 IPinfo.IP.Geo.Country Is not empty
 IPinfo.IP.Geo.Description Is not empty
-IPinfo.IP.Registrar.Abuse.Address Is not empty
 IP.Address Is not empty
 IP.Hostname Is not empty
 IP.ASN Is not empty
-IP.FeedRelatedIndicators.value Is not empty
-IP.FeedRelatedIndicators.type Is not empty
-IP.Relationships.EntityA Is not empty
-IP.Relationships.EntityB Is not empty
+IP.FeedRelatedIndicators.[0].value Is not empty
+IP.FeedRelatedIndicators.[0].type Is not empty
+IP.Relationships.[0].EntityA Is not empty
+IP.Relationships.[0].EntityB Is not empty
 IP.Relationships.[0].Relationship Is not empty
 IP.Relationships.[0].EntityAType Is not empty
 IP.Relationships.[0].EntityBType Is not empty
@@ -24,3 +23,7 @@ DBotScore.Score Is not empty
 DBotScore.Reliability Is not empty
 DBotScore.Type Is not empty
 DBotScore.Vendor Is not empty
+IP.FeedRelatedIndicators.[0].description Is not empty
+IPinfo.IP.Organization Is defined
+IPinfo.IP.Registrar Is defined
+IPinfo.IP.Tags Is defined
