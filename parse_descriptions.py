@@ -24,7 +24,7 @@ def parse_descriptions(url: str, field_column: str, description_column: str, out
 
     for (key, value) in raw_mapping:
         if key in duplicates:
-            pass
+            continue
         elif key in mapping:
             duplicates.add(key)
             del mapping[key]
