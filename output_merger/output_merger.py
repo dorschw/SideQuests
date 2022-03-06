@@ -5,8 +5,6 @@ from ruamel.yaml import YAML
 yaml = YAML()
 yaml.representer.ignore_aliases = lambda *data: True
 
-NEW = Path("new.yml")
-OLD = Path("old.yml")
 
 
 def calculate_update(existing: dict, new: dict):
@@ -85,7 +83,7 @@ def merge_outputs(old: dict, new: dict):
 
 
 if __name__ == '__main__':
-    old = yaml.load(OLD)
-    new = yaml.load(NEW)
+    old = yaml.load(Path("old.yml"))
+    new = yaml.load(Path("new.yml"))
     result = merge_outputs(old, new)
     yaml.dump(result, open('result.yml', 'w'))
