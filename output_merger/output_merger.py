@@ -105,7 +105,6 @@ def fill_in(yml: dict):
                 output['description'] = existing_description
                 yml['script']['commands'][command_ix]['outputs'][output_ix] = output
     yaml.dump(yml, open('filled_in.yml', 'w'))
-    # return yml
 
 
 def merge():
