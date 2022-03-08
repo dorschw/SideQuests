@@ -6,7 +6,6 @@ yaml = YAML()
 yaml.representer.ignore_aliases = lambda *data: True
 
 
-
 def calculate_update(existing: dict, new: dict):
     update = {}
 
@@ -50,12 +49,13 @@ def calculate_update(existing: dict, new: dict):
     return update
 
 
-def read_outputs(yaml: dict) -> dict[str, dict]:
+def read_outputs(yml: dict) -> dict[str, dict]:
     return {
         command['name']: {
-            output['contextPath']: output for output in command.get('outputs', [])
+            output['contextPath']: output
+            for output in command.get('outputs', [])
         }
-        for command in yaml.get('script', {}).get('commands')
+        for command in yml.get('script', {}).get('commands')
     }
 
 
@@ -82,8 +82,38 @@ def merge_outputs(old: dict, new: dict):
     return old
 
 
-if __name__ == '__main__':
+def get_unique_nonempty_descriptions(yml: dict):
+    commands = read_outputs(yml).values()
+    descriptions = {}
+    for command in commands:
+        for output in command.values():
+            description = output.get('description')
+            name = output.get('contextPath')
+            if name and description and name not in descriptions:
+                descriptions[name] = description
+    return descriptions
+
+
+def fill_in(yml: dict):
+    descriptions = get_unique_nonempty_descriptions(yml)
+
+    for command_ix, command in enumerate(yml.get('script', {}).get('commands')):
+        for output_ix, output in enumerate(command.get('outputs', [])):
+            name = output.get('contextPath')
+            description = output.get('description')
+            if (existing_description := descriptions.get(name)) and not description:
+                output['description'] = existing_description
+                yml['script']['commands'][command_ix]['outputs'][output_ix] = output
+    yaml.dump(yml, open('filled_in.yml', 'w'))
+    # return yml
+
+
+def merge():
     old = yaml.load(Path("old.yml"))
     new = yaml.load(Path("new.yml"))
     result = merge_outputs(old, new)
     yaml.dump(result, open('result.yml', 'w'))
+
+
+if __name__ == '__main__':
+    fill_in(yaml.load(Path('to_fill.yml')))
