@@ -146,6 +146,26 @@ def common_outputs():
         json.dump(counters, f)
 
 
-if __name__ == '__main__':
+def find_top_outputs():
+    with open('counters.json') as f:
+        counters = json.load(f)
+    # counter = Counter((command.split(".")[0] for command in counters))
+    # print(prefixes)
+    top = {}
+    for command, counter in counters.items():
+        if max(counter.values()) < 3:
+            continue
+        if command.split(".")[0] in {'File', 'IP', 'DBotScore', 'CustomIndicator', 'FileSignature',
+                                     'FeedRelatedIndicators',
+                                     'CommunityNotes', 'Publications', 'Behaviors', 'CVE', 'EMAIL', 'URL', 'Email',
+                                     'Domain', 'Endpoint', 'Account', 'Cryptocurrency', 'AttackPattern',
+                                     'CertificatePublicKey', 'GeneralName', 'CertificateExtension', 'Certificate'}:
+            most_common = max(counter.items(), key=lambda x: x[1])[0]
+            top[command] = most_common
+    print(json.dumps(top, sort_keys=True, indent=1))
+
+
+# if __name__ == '__main__':
     # fill_in(yaml.load(Path('to_fill.yml')))
-    common_outputs()
+    # common_outputs()
+    # find_top_outputs()
