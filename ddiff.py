@@ -1,3 +1,6 @@
+import json
+
+
 def ddiff(dict1: dict, dict2: dict):
     if not dict1:
         print('dict1 is empty/None')
@@ -14,3 +17,9 @@ def ddiff(dict1: dict, dict2: dict):
         print(f'key {k} missing from dict2')
     for k in set(dict2.keys()).difference(dict1.keys()):
         print(f'key {k} missing from dict1')
+
+
+if __name__ == '__main__':
+    d1 = json.load(open('old.json'))
+    d2 = json.load(open('new.json'))
+    print(ddiff(d1, d2))

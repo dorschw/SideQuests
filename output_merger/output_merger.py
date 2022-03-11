@@ -1,3 +1,5 @@
+import json
+from collections import Counter
 from pathlib import Path
 
 from ruamel.yaml import YAML
@@ -55,7 +57,7 @@ def read_outputs(yml: dict) -> dict[str, dict]:
             output['contextPath']: output
             for output in command.get('outputs', [])
         }
-        for command in yml.get('script', {}).get('commands')
+        for command in yml.get('script', {}).get('commands', [])
     }
 
 
@@ -114,5 +116,36 @@ def merge():
     yaml.dump(result, open('result.yml', 'w'))
 
 
+def common_outputs():
+    counters = {}
+    for i, integration in enumerate(Path('/Users/dschwartz/dev/demisto/content/Packs').rglob("*/Integrations/*/*.yml")):
+        if i % 10 == 0:
+            print(i)
+        yml = yaml.load(integration.open())
+        try:
+            yml_outputs = read_outputs(yml).items()
+        except Exception as e:
+            print(f'could not read {integration}: {e}')
+            qcontinue
+
+        for command, outputs in yml_outputs:
+            for output in outputs.values():
+                path = output.get('contextPath')
+                desc = output.get('description')
+                if path and desc:
+                    if path in counters:
+                        counters[path].update([desc])
+                    else:
+                        counters[path] = Counter([desc])
+
+    # for command, counter in counters.items():
+    #     if max(counter.values()) > 3:
+    #         print(command, counter)
+
+    with Path('counters.json').open('w') as f:
+        json.dump(counters, f)
+
+
 if __name__ == '__main__':
-    fill_in(yaml.load(Path('to_fill.yml')))
+    # fill_in(yaml.load(Path('to_fill.yml')))
+    common_outputs()
