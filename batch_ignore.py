@@ -1,6 +1,7 @@
 from configparser import ConfigParser
 from pathlib import Path
 from functools import lru_cache
+import re
 
 CONTENT_PATH = Path("../content")
 
@@ -40,3 +41,17 @@ def add_error(pack_name: str, file_name: str, error_code: str) -> None:
 
     with pack_ignore_path.open("w") as f:
         config.write(f, space_around_delimiters=False)
+
+def auto_ignore_all(error_string:str):
+    error_regex = re.compile("Packs\/(?P<pack_name>.*)\/.*\/(?P<file>.*\..*) - \[(?P<error_code>[A-Z]{2}\d{3})\]")
+    for line in filter(None, error_string.splitlines()):
+        if match := error_regex.match(line):
+            add_error(pack_name=match['pack_name'], file_name=match['file'], error_code=match['error_code'])
+        else:
+            print(f"could not parse {line=}")
+
+# EXAMPLE RUN 
+# auto_ignore_all("""
+# Packs/DeprecatedContent/Scripts/script-DefaultIncidentClassifier.yml - [BA120],
+# Packs/trendMicroDsm/Scripts/script-TrendMicroClassifier_README.md - [BA120]
+# """)
