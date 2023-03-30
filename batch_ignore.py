@@ -46,7 +46,7 @@ def add_error(pack_name: str, file_name: str, error_code: str) -> None:
         config.write(f, space_around_delimiters=False)
 
 def auto_ignore_all(error_string:str):
-    error_regex = re.compile(r".*Packs\/(?P<pack_name>.*)\/.*\/(?P<file>.*\..*) - \[(?P<error_code>[A-Z]{2}\d{3})\]")
+    error_regex = re.compile(r".*Packs\/(?P<pack_name>.*?)\/.*\/(?P<file>.*\..*) - \[(?P<error_code>[A-Z]{2}\d{3})\]")
     for line in filter(None, error_string.splitlines()):
         if match := error_regex.match(line):
             add_error(pack_name=match['pack_name'], file_name=match['file'], error_code=match['error_code'])
