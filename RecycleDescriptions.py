@@ -10,16 +10,18 @@ def result_to_contextpaths(
 ) -> set[str]:
     result = set()
 
-    for k, v in json_output.items():
-        if isinstance(v, dict):
-            result |= result_to_contextpaths(v, prev_keys + [k])
+    for key, value in json_output.items():
+        current_key = prev_keys + [key]
 
-        elif isinstance(v, list):
-            for item in v:
-                result |= result_to_contextpaths(item, prev_keys + [k])
+        if isinstance(value, dict):
+            result |= result_to_contextpaths(value, current_key)
+
+        elif isinstance(value, list):
+            for item in value:
+                result |= result_to_contextpaths(item, current_key)
 
         else:
-            result.add(".".join(prev_keys + [k]))
+            result.add(".".join(current_key))
 
     return result
 
@@ -52,7 +54,7 @@ def fill_in_from_dupes(integration_yml: dict) -> dict:
     # fill in missing descriptions
     for command in integration_yml["script"]["commands"]:
         outputs = command.get("outputs", ())
-        
+
         for output in command.get("outputs", ()):
             path = output["contextPath"]
             description = output.get("description", "")
@@ -71,9 +73,9 @@ def fill_in_from_dupes(integration_yml: dict) -> dict:
 def reuse_descrpitions(path: Path):
     with open(path) as f:
         existing = YAML().load(f)
-        
+
     original = copy.deepcopy(existing)
-    
+
     if (result := fill_in_from_dupes(existing)) and (result != original):
         with open(path, "w") as f:
             YAML().dump(result, f)
