@@ -1,24 +1,24 @@
 import copy
+import json
 from pathlib import Path
 from typing import Iterable
 from ruamel.yaml import YAML
 
 
-def result_to_contextpaths(
-    json_output: dict,
-    prev_keys: list[str],
+def json_to_contextpaths(
+    json_output: dict, prev_keys: tuple[str, ...] = ()
 ) -> set[str]:
     result = set()
 
     for key, value in json_output.items():
-        current_key = prev_keys + [key]
+        current_key = prev_keys + (key,)
 
         if isinstance(value, dict):
-            result |= result_to_contextpaths(value, current_key)
+            result |= json_to_contextpaths(value, current_key)
 
         elif isinstance(value, list):
             for item in value:
-                result |= result_to_contextpaths(item, current_key)
+                result |= json_to_contextpaths(item, current_key)
 
         else:
             result.add(".".join(current_key))
@@ -83,8 +83,19 @@ def reuse_descrpitions(path: Path):
         print("nothing changed")
 
 
+def extract_context_paths(json_path: Path):
+    print_context_paths(json_to_contextpaths(json.loads(json_path.read_text())))
+
+
+print(
+    extract_context_paths(
+        Path(
+            
+        )
+    )
+)
 reuse_descrpitions(
     Path(
-        "/~/dev/demisto/content/Packs/PATHelpdeskAdvanced/Integrations/PATHelpdeskAdvanced/PATHelpdeskAdvanced.yml"
+        
     )
 )
